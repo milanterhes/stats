@@ -44,7 +44,7 @@ export class InstagramService extends ProfileStatService {
     let result;
     try {
       result = await axios.get(
-        "https://i.instagram.com/api/v1/users/web_profile_info/?username=" +
+        "https://instagram.com/api/v1/users/web_profile_info/?username=" +
           handle,
         {
           // this is a workaround for the instagram api authentication
