@@ -11,7 +11,7 @@ export class BaseError extends Error {
 
     logger.error(message);
     if (originalError) {
-      logger.error(originalError);
+      logger.error(JSON.stringify(originalError));
     }
   }
 }

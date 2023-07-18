@@ -10,7 +10,7 @@ export const ServiceOutputSchema = z.object({
   likes: z.number().nullable(),
 });
 
-type ServiceOutput = z.infer<typeof ServiceOutputSchema>;
+export type ServiceOutput = z.infer<typeof ServiceOutputSchema>;
 
 abstract class ProfileStatService {
   abstract getProfileStats(handle: string): Promise<ServiceOutput>;

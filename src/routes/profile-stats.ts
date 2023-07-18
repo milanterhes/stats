@@ -40,15 +40,8 @@ const route = endpointFactory.build({
       platform === Platform.Instagram
         ? new InstagramService()
         : new LensService();
-    try {
-      const stats = await service.getProfileStats(handle);
-      return stats;
-    } catch (error) {
-      if (error instanceof BaseError) {
-      }
-      logger.error(error);
-      throw error;
-    }
+    const stats = await service.getProfileStats(handle);
+    return stats;
   },
 });
 
