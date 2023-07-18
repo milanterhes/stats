@@ -45,6 +45,9 @@ export class InstagramService extends ProfileStatService {
         }
       );
     } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
+        throw new ProfileStatError("Profile not found", 404, error);
+      }
       throw new ProfileStatError("Failed to fetch profile stats", 500, error);
     }
 
@@ -60,6 +63,78 @@ export class InstagramService extends ProfileStatService {
       following: parsed.data.user.edge_follow.count,
       posts: parsed.data.user.edge_owner_to_timeline_media.count,
       likes: null,
+    };
+  }
+}
+
+const query = `
+query GetProfileData($handle: Handle) {
+    profile(request: { handle: $handle }) {
+      handle
+      id
+      stats {
+        totalFollowers
+        totalPosts
+        totalFollowing
+        totalCollects
+      }
+    }
+  }
+  `;
+
+const LensProfileSchema = z.object({
+  data: z.object({
+    profile: z
+      .object({
+        stats: z.object({
+          totalFollowers: z.number(),
+          totalPosts: z.number(),
+          totalFollowing: z.number(),
+          totalCollects: z.number(),
+        }),
+      })
+      .or(z.null()),
+  }),
+});
+
+export class LensService extends ProfileStatService {
+  async getProfileStats(handle: string): Promise<ProfileStat> {
+    const variables = {
+      handle,
+    };
+    let result;
+    try {
+      result = await axios.post(
+        "https://api.lens.dev/",
+        {
+          query,
+          variables,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } catch (error) {
+      throw new ProfileStatError("Failed to fetch profile stats", 500, error);
+    }
+
+    let parsed;
+    try {
+      parsed = LensProfileSchema.parse(result.data);
+    } catch (error) {
+      throw new ProfileStatError("Failed to parse profile stats", 500, error);
+    }
+
+    if (parsed.data.profile === null)
+      throw new ProfileStatError("Profile not found", 404);
+
+    return {
+      followers: parsed.data.profile.stats.totalFollowers,
+      following: parsed.data.profile.stats.totalFollowing,
+      posts: parsed.data.profile.stats.totalPosts,
+      likes: parsed.data.profile.stats.totalCollects,
     };
   }
 }

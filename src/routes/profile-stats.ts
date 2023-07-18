@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { zParseRequest } from "../utils";
-import { InstagramService } from "../services";
+import { InstagramService, LensService } from "../services";
 
 const router = Router();
 
@@ -20,8 +20,11 @@ const ProfileStatsHandleSchema = z.object({
 router.get("/:platform/:handle", async (req, res, next) => {
   try {
     const { params } = await zParseRequest(ProfileStatsHandleSchema, req);
-    const instagramService = new InstagramService();
-    const stats = await instagramService.getProfileStats(params.handle);
+    const service =
+      params.platform === Platform.Instagram
+        ? new InstagramService()
+        : new LensService();
+    const stats = await service.getProfileStats(params.handle);
     res.send(stats);
   } catch (error) {
     next(error);
