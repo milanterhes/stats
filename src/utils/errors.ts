@@ -34,3 +34,10 @@ export class ProfileStatError extends BaseError {
     this.name = "ProfileStatError";
   }
 }
+
+export class DbError extends BaseError {
+  constructor(message: string, status: number, originalError?: unknown) {
+    super(message, status, originalError);
+    this.name = "DbError";
+  }
+}

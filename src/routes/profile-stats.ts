@@ -5,13 +5,9 @@ import {
   LensService,
   ServiceOutputSchema,
 } from "../services";
-import { BaseError } from "../utils/errors";
 import { endpointFactory } from "../utils/api";
-
-enum Platform {
-  Instagram = "instagram",
-  Lens = "lens",
-}
+import { Platform } from "@prisma/client";
+import DbService from "../services/db";
 
 const ProfileStatsHandleSchema = withMeta(
   z.object({
@@ -21,11 +17,11 @@ const ProfileStatsHandleSchema = withMeta(
 )
   .example({
     handle: "georgehotz",
-    platform: Platform.Instagram,
+    platform: Platform.instagram,
   })
   .example({
     handle: "aave.lens",
-    platform: Platform.Lens,
+    platform: Platform.lens,
   });
 
 const route = endpointFactory.build({
@@ -34,13 +30,34 @@ const route = endpointFactory.build({
   method: "get",
   input: ProfileStatsHandleSchema,
   output: ServiceOutputSchema,
-  handler: async ({ input: { platform, handle }, options, logger }) => {
-    logger.debug("Options:", options);
-    const service =
-      platform === Platform.Instagram
+  handler: async ({ input: { platform, handle } }) => {
+    const dbService = new DbService();
+    const cachedStats = await dbService.getStats(platform, handle);
+
+    // if lastChecked is not older than 1 minute
+    if (
+      cachedStats?.lastChecked &&
+      cachedStats.lastChecked > new Date(Date.now() - 60000)
+    ) {
+      return cachedStats;
+    }
+
+    const statService =
+      platform === Platform.instagram
         ? new InstagramService()
         : new LensService();
-    const stats = await service.getProfileStats(handle);
+
+    const stats = await statService.getProfileStats(handle);
+
+    await dbService.insertStats({
+      platform,
+      handle,
+      followers: stats.followers,
+      following: stats.following,
+      likes: stats.likes,
+      posts: stats.posts,
+    });
+
     return stats;
   },
 });

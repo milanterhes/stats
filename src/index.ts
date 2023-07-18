@@ -48,6 +48,7 @@ const config = createConfig({
   server: {
     listen: 3000,
   },
+  startupLogo: false,
 });
 
 const yamlString = new Documentation({
