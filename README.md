@@ -1,5 +1,7 @@
 # Profile data api
 
+Deployed at: https://stats-service.onrender.com/api-docs/
+
 ## Getting started
 
 - create `.env` file in the root of the project with the following content:
