@@ -8,7 +8,7 @@ import {
   withMeta,
 } from "express-zod-api";
 import { z } from "zod";
-import { BaseError } from ".";
+import { BaseError } from "./errors";
 
 // this is based on the default result handler, but with BaseError check
 const resultHandler = createResultHandler({

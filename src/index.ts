@@ -11,7 +11,7 @@ import swaggerUi from "swagger-ui-express";
 import yaml from "yaml";
 import { z } from "zod";
 import { default as profileStatEndpoint } from "./routes/profile-stats";
-import { logger } from "./utils";
+import { logger } from "./utils/logger";
 
 dotenv.config();
 const port = process.env.PORT ?? 3000;

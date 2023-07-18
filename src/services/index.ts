@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
-import { ProfileStatError } from "../utils";
+import { ProfileStatError } from "../utils/errors";
 
 // The fields are nullable in case the selected platform doesn't return them
 export const ServiceOutputSchema = z.object({

@@ -5,7 +5,7 @@ import {
   LensService,
   ServiceOutputSchema,
 } from "../services";
-import { BaseError } from "../utils";
+import { BaseError } from "../utils/errors";
 import { endpointFactory } from "../utils/api";
 
 enum Platform {
