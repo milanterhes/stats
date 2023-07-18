@@ -20,7 +20,7 @@ const ProfileStatsHandleSchema = withMeta(
     platform: Platform.instagram,
   })
   .example({
-    handle: "aave.lens",
+    handle: "aaveaave.lens",
     platform: Platform.lens,
   });
 
