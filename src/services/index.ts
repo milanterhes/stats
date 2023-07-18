@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { ProfileStatError } from "../utils/errors";
+import { logger } from "../utils/logger";
 
 // The fields are nullable in case the selected platform doesn't return them
 export const ServiceOutputSchema = z.object({
@@ -54,6 +55,7 @@ export class InstagramService extends ProfileStatService {
         }
       );
     } catch (error) {
+      logger.error(error);
       if (error instanceof AxiosError && error.response?.status === 404) {
         throw new ProfileStatError("Profile not found", 404, error);
       }
@@ -61,9 +63,11 @@ export class InstagramService extends ProfileStatService {
     }
 
     let parsed;
+    logger.info(result.data);
     try {
       parsed = InstagramProfileSchema.parse(result.data);
     } catch (error) {
+      logger.error(error);
       throw new ProfileStatError("Failed to parse profile stats", 500, error);
     }
 
@@ -132,6 +136,7 @@ export class LensService extends ProfileStatService {
         }
       );
     } catch (error) {
+      logger.error(error);
       throw new ProfileStatError("Failed to fetch profile stats", 500, error);
     }
 
@@ -139,6 +144,7 @@ export class LensService extends ProfileStatService {
     try {
       parsed = LensProfileSchema.parse(result.data);
     } catch (error) {
+      logger.error(error);
       throw new ProfileStatError("Failed to parse profile stats", 500, error);
     }
 
