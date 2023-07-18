@@ -51,13 +51,14 @@ const config = createConfig({
   startupLogo: false,
 });
 
+const url = process.env.SERVICE_URL ?? "http://localhost:3000";
+
 const yamlString = new Documentation({
   routing,
   config,
   version: "0.0.1",
   title: "Profile Stat API",
-  // this should be loaded from the env
-  serverUrl: "http://localhost:3000",
+  serverUrl: url,
   composition: "inline",
 }).getSpecAsYaml();
 
@@ -69,5 +70,5 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(notFoundHandler);
 app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+  console.log(`⚡️[server]: Server is running at ${url}:${port}`);
 });

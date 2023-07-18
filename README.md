@@ -7,6 +7,7 @@ Deployed at: https://stats-service.onrender.com/api-docs/
 - create `.env` file in the root of the project with the following content:
 ```
 DATABASE_URL=[database url]
+SERVICE_URL=http://localhost:3000
 ```
 - `npm install`
 - `npm run gen`
