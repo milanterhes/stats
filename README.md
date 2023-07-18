@@ -14,13 +14,13 @@ SERVICE_URL=http://localhost:3000
 - `npm run dev`
 
 ## The plan:
-- [ ] API written in Typescript with Express
-- [ ] OpenAPI + Swagger interface
-- [ ] Instagram profile data
-- [ ] Lens protocol profile data
+- [x] API written in Typescript with Express
+- [x] OpenAPI + Swagger interface
+- [x] Instagram profile data
+- [x] Lens protocol profile data
 ---
 Bonus
-- [ ] Persistance / Cache
+- [x] Persistance / Cache
 - [ ] Frontend
 - [ ] Auth
 
