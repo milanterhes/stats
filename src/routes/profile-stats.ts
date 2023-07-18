@@ -1,10 +1,12 @@
-import { defaultEndpointsFactory, withMeta } from "express-zod-api";
+import { withMeta } from "express-zod-api";
 import { z } from "zod";
 import {
   InstagramService,
   LensService,
   ServiceOutputSchema,
 } from "../services";
+import { BaseError } from "../utils";
+import { endpointFactory } from "../utils/api";
 
 enum Platform {
   Instagram = "instagram",
@@ -26,7 +28,7 @@ const ProfileStatsHandleSchema = withMeta(
     platform: Platform.Lens,
   });
 
-const route = defaultEndpointsFactory.build({
+const route = endpointFactory.build({
   description:
     "Get profile statistics such as followers, following, posts, and likes.",
   method: "get",
@@ -38,8 +40,15 @@ const route = defaultEndpointsFactory.build({
       platform === Platform.Instagram
         ? new InstagramService()
         : new LensService();
-    const stats = await service.getProfileStats(handle);
-    return stats;
+    try {
+      const stats = await service.getProfileStats(handle);
+      return stats;
+    } catch (error) {
+      if (error instanceof BaseError) {
+      }
+      logger.error(error);
+      throw error;
+    }
   },
 });
 
