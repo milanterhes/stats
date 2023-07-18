@@ -1,34 +1,46 @@
-import { Router } from "express";
+import { defaultEndpointsFactory, withMeta } from "express-zod-api";
 import { z } from "zod";
-import { zParseRequest } from "../utils";
-import { InstagramService, LensService } from "../services";
-
-const router = Router();
+import {
+  InstagramService,
+  LensService,
+  ServiceOutputSchema,
+} from "../services";
 
 enum Platform {
   Instagram = "instagram",
   Lens = "lens",
 }
 
-const ProfileStatsHandleSchema = z.object({
-  params: z.object({
+const ProfileStatsHandleSchema = withMeta(
+  z.object({
     platform: z.nativeEnum(Platform),
     handle: z.string(),
-  }),
-});
+  })
+)
+  .example({
+    handle: "georgehotz",
+    platform: Platform.Instagram,
+  })
+  .example({
+    handle: "aave.lens",
+    platform: Platform.Lens,
+  });
 
-router.get("/:platform/:handle", async (req, res, next) => {
-  try {
-    const { params } = await zParseRequest(ProfileStatsHandleSchema, req);
+const route = defaultEndpointsFactory.build({
+  description:
+    "Get profile statistics such as followers, following, posts, and likes.",
+  method: "get",
+  input: ProfileStatsHandleSchema,
+  output: ServiceOutputSchema,
+  handler: async ({ input: { platform, handle }, options, logger }) => {
+    logger.debug("Options:", options);
     const service =
-      params.platform === Platform.Instagram
+      platform === Platform.Instagram
         ? new InstagramService()
         : new LensService();
-    const stats = await service.getProfileStats(params.handle);
-    res.send(stats);
-  } catch (error) {
-    next(error);
-  }
+    const stats = await service.getProfileStats(handle);
+    return stats;
+  },
 });
 
-export default router;
+export default route;

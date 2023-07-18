@@ -2,15 +2,18 @@ import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { ProfileStatError } from "../utils";
 
-interface ProfileStat {
-  followers: number | null;
-  following: number | null;
-  posts: number | null;
-  likes: number | null;
-}
+// The fields are nullable in case the selected platform doesn't return them
+export const ServiceOutputSchema = z.object({
+  followers: z.number().nullable(),
+  following: z.number().nullable(),
+  posts: z.number().nullable(),
+  likes: z.number().nullable(),
+});
+
+type ServiceOutput = z.infer<typeof ServiceOutputSchema>;
 
 abstract class ProfileStatService {
-  abstract getProfileStats(handle: string): Promise<ProfileStat>;
+  abstract getProfileStats(handle: string): Promise<ServiceOutput>;
 }
 
 const InstagramProfileSchema = z.object({
@@ -30,7 +33,13 @@ const InstagramProfileSchema = z.object({
 });
 
 export class InstagramService extends ProfileStatService {
-  async getProfileStats(handle: string): Promise<ProfileStat> {
+  /**
+   * Fetches profile statistics for the given handle using Instagram API.
+   * @param handle - The handle of the Instagram profile.
+   * @returns A Promise that resolves to the profile statistics.
+   * @throws {ProfileStatError} If there's an error fetching or parsing the data.
+   */
+  async getProfileStats(handle: string): Promise<ServiceOutput> {
     let result;
     try {
       result = await axios.get(
@@ -98,7 +107,13 @@ const LensProfileSchema = z.object({
 });
 
 export class LensService extends ProfileStatService {
-  async getProfileStats(handle: string): Promise<ProfileStat> {
+  /**
+   * Fetches profile statistics for the given handle using Lens Protocol API.
+   * @param handle - The handle of the profile.
+   * @returns A Promise that resolves to the profile statistics.
+   * @throws {ProfileStatError} If there's an error fetching or parsing the data.
+   */
+  async getProfileStats(handle: string): Promise<ServiceOutput> {
     const variables = {
       handle,
     };
